@@ -145,14 +145,19 @@ resposta = bfs(estado_inicial, estado_final)
 total_movimentos = len(resposta) - 1
 contador = 0
 
-for estado in resposta:
-    print('')
-    print('------------')
-    print('\033[1;36mMovimento\033[0m', contador)
-    print('Missionários:', estado[0])
-    print('Canibais:', estado[1])
-    print('Posição do barco:', estado[2])
-    print('------------')
-    contador += 1
+if resposta:
+    for estado in resposta:
+        print('')
+        print('------------')
+        print('\033[1;36mMovimento\033[0m', contador)
+        print('Missionários:', estado[0])
+        print('Canibais:', estado[1])
+        print('Posição do barco:', estado[2])
+        print('------------')
+        contador += 1
 
-print('Total de Movimentos:', total_movimentos)
+    print('Total de Movimentos:', total_movimentos)
+else:
+    print('Não há solução para o problema.')
+
+exibir_instrucoes()
