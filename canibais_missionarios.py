@@ -3,15 +3,12 @@ As regras são de que o barco pode levar no máximo 2 pessoas e que sempre devem
 Para o barco: 1 (está na margem) ou 0 (está do outro lado).
 [Missionarios, Canibais, Barco]
 Estado Inicial = [3,3,1] -> Todos os missionários e canibais + o barco
-Estado Final = [0,0,0] -> Todos passaram
+Estado Final = [0,0,0] -> Todos passaram para a outra margem
 """
 
-
-# Constantes para representar as margens do rio
-POSICAO_ESQUERDA = 1
-POSICAO_DIREITA = 0
-
-# Constantes para o número inicial de missionários e canibais
+# Declaração das margens do rio e do número inicial de missionários e canibais
+MARGEM_ESQUERDA = 1
+MARGEM_DIREITA = 0
 NUM_MISSIONARIOS = 3
 NUM_CANIBAIS = 3
 
@@ -39,7 +36,7 @@ def movimentos(estado, explorados):
     missionarios, canibais, posicao_barco = estado
 
     print("Estado: ", estado)
-    if posicao_barco == POSICAO_ESQUERDA:
+    if posicao_barco == MARGEM_ESQUERDA:
         # Se o barco está na margem esquerda
         for i in range(1, 3):
             for j in range(0, i + 1):
@@ -48,7 +45,7 @@ def movimentos(estado, explorados):
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
                     novo_estado = [missionarios_novos,
-                                   canibais_novos, POSICAO_DIREITA]
+                                   canibais_novos, MARGEM_DIREITA]
                     if novo_estado in explorados:
                         possibilidades.append(
                             (novo_estado, True))  # Estado explorado
@@ -64,7 +61,7 @@ def movimentos(estado, explorados):
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
                     novo_estado = [missionarios_novos,
-                                   canibais_novos, POSICAO_ESQUERDA]
+                                   canibais_novos, MARGEM_ESQUERDA]
                     if novo_estado in explorados:
                         possibilidades.append(
                             (novo_estado, True))  # Estado explorado
@@ -76,7 +73,7 @@ def movimentos(estado, explorados):
     for p, explorado in possibilidades:
         if explorado:
             # Imprime em vermelho os estados explorados
-            print('\033[1;31m', p, '\033[0m')
+            print('\033[1;30m', p, '\033[0m')
         else:
             if p[2] == MARGEM_ESQUERDA:
                 # Imprime em amarelo os estados na margem esquerda
@@ -137,8 +134,8 @@ def bfs(estado_inicial, estado_final):
     return caminho
 
 
-estado_inicial = [NUM_MISSIONARIOS, NUM_CANIBAIS, POSICAO_ESQUERDA]
-estado_final = [0, 0, POSICAO_DIREITA]
+estado_inicial = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
+estado_final = [0, 0, MARGEM_DIREITA]
 
 resposta = bfs(estado_inicial, estado_final)
 # O total de movimentos é igual ao tamanho da resposta menos o estado inicial
