@@ -6,81 +6,95 @@ Estado Inicial = [3,3,1] -> Todos os missionários e canibais + o barco
 Estado Final = [0,0,0] -> Todos passaram
 """
 
-# Retorna uma lista dos movimentos possíveis (viagens permitidas) em um dado estado do problema
-
 
 def movimentos(estado):
-
+    """
+    Retorna uma lista dos movimentos possíveis (viagens permitidas)
+    em um dado estado do problema
+    """
     possibilidades = []
-    miss = estado[0]
-    cani = estado[1]
-    barco = estado[2]
+    missionarios = estado[0]
+    canibais = estado[1]
+    margem_barco = estado[2]
 
-    # Barco na margem esquerda
-    if barco == 1:
+    if margem_barco == 1:
+        # Se o barco está na margem esquerda
         for i in range(0, 3):
             for j in range(0, 3):
-                miss2 = miss - i
-                cani2 = cani - j
-                if i+j <= 2 and i+j >= 1 and miss2 >= 0 and cani2 >= 0 and miss2 <= 3 and cani2 <= 3:
-                    if miss2 != 0:
-                        if miss2 >= cani2:
-                            if (3-miss2) != 0:
-                                if (3-cani+j) <= (3-miss+i):
-                                    possibilidades.append([miss2, cani2, 0])
+                missionarios_novos = missionarios - i
+                canibais_novos = canibais - j
+                if i + j <= 2 and i + j >= 1 and missionarios_novos >= 0 and canibais_novos >= 0 and missionarios_novos <= 3 and canibais_novos <= 3:
+                    # Verifica se o número total de pessoas no barco é válido (1 a 2 pessoas)
+                    # Verifica se o número de missionários e canibais não é negativo
+                    # Verifica se a quantidade de missionários e canibais não excede a quantidade inicial
+                    if missionarios_novos != 0:
+                        if missionarios_novos >= canibais_novos:
+                            if (3 - missionarios_novos) != 0:
+                                # Verifica se há missionários na margem oposta
+                                if (3 - canibais_novos + j) <= (3 - missionarios + i):
+                                    # Verifica se a quantidade de missionários na margem oposta
+                                    # não é menor do que a quantidade de canibais na margem oposta
+                                    possibilidades.append(
+                                        [missionarios_novos, canibais_novos, 0])
                             else:
-                                possibilidades.append([miss2, cani2, 0])
+                                # Se não há missionários na margem oposta, adiciona a possibilidade
+                                possibilidades.append(
+                                    [missionarios_novos, canibais_novos, 0])
                     else:
-                        possibilidades.append([miss2, cani2, 0])
-        # Barco na margem direita
+                        # Se não há missionários na viagem, adiciona a possibilidade
+                        possibilidades.append(
+                            [missionarios_novos, canibais_novos, 0])
     else:
+        # Se o barco está na margem oposta, testa as possibilidades de travessia
         for i in range(0, 3):
             for j in range(0, 3):
-                miss2 = miss + i
-                cani2 = cani + j
-                if i+j <= 2 and i+j >= 1 and miss2 >= 0 and cani2 >= 0 and miss2 <= 3 and cani2 <= 3:
-                    if miss != 0:
-                        if (3-miss2) != 0:
-                            if (3-cani-j) <= (3-miss-i) and miss2 >= cani2:
-                                possibilidades.append([miss2, cani2, 1])
+                missionarios_novos = missionarios + i
+                canibais_novos = canibais + j
+                if i + j <= 2 and i + j >= 1 and missionarios_novos >= 0 and canibais_novos >= 0 and missionarios_novos <= 3 and canibais_novos <= 3:
+                    # Verifica se o número total de pessoas no barco é válido (1 a 2 pessoas)
+                    # Verifica se o número de missionários e canibais não é negativo
+                    # Verifica se a quantidade de missionários e canibais não excede a quantidade inicial
+                    if missionarios != 0:
+                        if (3 - missionarios_novos) != 0:
+                            # Verifica se há missionários na margem oposta
+                            if (3 - canibais_novos - j) <= (3 - missionarios - i) and missionarios_novos >= canibais_novos:
+                                # Verifica se a quantidade de missionários na margem oposta
+                                # não é menor do que a quantidade de canibais na margem oposta
+                                possibilidades.append(
+                                    [missionarios_novos, canibais_novos, 1])
                         else:
-                            possibilidades.append([miss2, cani2, 1])
+                            # Se não há missionários na margem oposta, adiciona a possibilidade
+                            possibilidades.append(
+                                [missionarios_novos, canibais_novos, 1])
                     else:
-                        possibilidades.append([miss2, cani2, 1])
+                        # Se não há missionários na viagem, adiciona a possibilidade
+                        possibilidades.append(
+                            [missionarios_novos, canibais_novos, 1])
 
     return possibilidades
 
 
-"""
-Agora é feita uma simples implementação do BFS.
-A fronteira é o estado inicial, a priori e nenhum nó foi explorado.
-Então 'path' é o primeiro nó da fronteira, que em seguida é removido.
-O fim do 'path' é o último nó explorado através daquela forma de solução.
-
-Se um nó já foi explorado é ignorado.
-
-Checa-se todas as possibilidades de movimento do último nó de um dado
-caminho e, caso não tenha sido visitado antes, adiciona-se à fronteira
-mais essa possível resposta. Se esse nó explorado for o estado desejado
-o algoritmo se encerra.
-"""
-
-
+# A busca em amplitude deve garantir que nenhum estado seja visitado mais de uma vez,
+# portanto usamos uma lista de estados explorados para garantir isso.
 def bfs(inicio, final):
+    # O front é o nosso estado inicial
+    # O explorado é uma lista de estados já visitados
     front = [[inicio]]
-    explored = []
+    explorado = []
+    # Enquanto houver estados a serem explorados
     while front:
         path = front[0]
         front = front[1:]
-        end = path[-1]
-        if end in explored:
+        fim = path[-1]
+        if fim in explorado:
             continue
-        for move in movimentos(end):
-            if move in explored:
+        for movimento in movimentos(fim):
+            if movimento in explorado:
                 continue
-            front.append(path + [move])
-        explored.append(end)
-        if end == final:
+            front.append(path + [movimento])
+        explorado.append(fim)
+        # Se o estado final for encontrado, retorna o caminho
+        if fim == final:
             break
 
     return path
@@ -91,7 +105,10 @@ final = [0, 0, 0]
 
 resposta = bfs(inicio, final)
 contador = 0
+
 for estado in resposta:
+    print('')
+    print('------------')
     print('Movimento', contador)
     print('Missionários:', estado[0])
     print('Canibais:', estado[1])
