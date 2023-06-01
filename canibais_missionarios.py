@@ -7,75 +7,64 @@ Estado Final = [0,0,0] -> Todos passaram
 """
 
 
+# Constantes para representar as margens do rio
+MARGEM_ESQUERDA = 0
+MARGEM_DIREITA = 1
+
+# Constantes para o número inicial de missionários e canibais
+NUM_MISSIONARIOS = 3
+NUM_CANIBAIS = 3
+
+
 def movimentos(estado):
     """
     Retorna uma lista dos movimentos possíveis (viagens permitidas)
     em um dado estado do problema
     """
     possibilidades = []
-    missionarios = estado[0]
-    canibais = estado[1]
-    margem_barco = estado[2]
+    missionarios, canibais, margem_barco = estado
 
-    if margem_barco == 1:
+    if margem_barco == MARGEM_ESQUERDA:
         # Se o barco está na margem esquerda
-        for i in range(0, 3):
-            for j in range(0, 3):
-                missionarios_novos = missionarios - i
-                canibais_novos = canibais - j
-                if i + j <= 2 and i + j >= 1 and missionarios_novos >= 0 and canibais_novos >= 0 and missionarios_novos <= 3 and canibais_novos <= 3:
-                    # Verifica se o número total de pessoas no barco é válido (1 a 2 pessoas)
-                    # Verifica se o número de missionários e canibais não é negativo
-                    # Verifica se a quantidade de missionários e canibais não excede a quantidade inicial
-                    if missionarios_novos != 0:
-                        if missionarios_novos >= canibais_novos:
-                            if (3 - missionarios_novos) != 0:
-                                # Verifica se há missionários na margem oposta
-                                if (3 - canibais_novos + j) <= (3 - missionarios + i):
-                                    # Verifica se a quantidade de missionários na margem oposta
-                                    # não é menor do que a quantidade de canibais na margem oposta
-                                    possibilidades.append(
-                                        [missionarios_novos, canibais_novos, 0])
-                            else:
-                                # Se não há missionários na margem oposta, adiciona a possibilidade
-                                possibilidades.append(
-                                    [missionarios_novos, canibais_novos, 0])
-                    else:
-                        # Se não há missionários na viagem, adiciona a possibilidade
-                        possibilidades.append(
-                            [missionarios_novos, canibais_novos, 0])
+        for i in range(1, 3):
+            for j in range(0, i + 1):
+                missionarios_novos = missionarios - j
+                canibais_novos = canibais - (i - j)
+
+                if is_estado_valido(missionarios_novos, canibais_novos):
+                    possibilidades.append(
+                        [missionarios_novos, canibais_novos, MARGEM_DIREITA])
     else:
-        # Se o barco está na margem oposta, testa as possibilidades de travessia
-        for i in range(0, 3):
-            for j in range(0, 3):
-                missionarios_novos = missionarios + i
-                canibais_novos = canibais + j
-                if i + j <= 2 and i + j >= 1 and missionarios_novos >= 0 and canibais_novos >= 0 and missionarios_novos <= 3 and canibais_novos <= 3:
-                    # Verifica se o número total de pessoas no barco é válido (1 a 2 pessoas)
-                    # Verifica se o número de missionários e canibais não é negativo
-                    # Verifica se a quantidade de missionários e canibais não excede a quantidade inicial
-                    if missionarios != 0:
-                        if (3 - missionarios_novos) != 0:
-                            # Verifica se há missionários na margem oposta
-                            if (3 - canibais_novos - j) <= (3 - missionarios - i) and missionarios_novos >= canibais_novos:
-                                # Verifica se a quantidade de missionários na margem oposta
-                                # não é menor do que a quantidade de canibais na margem oposta
-                                possibilidades.append(
-                                    [missionarios_novos, canibais_novos, 1])
-                        else:
-                            # Se não há missionários na margem oposta, adiciona a possibilidade
-                            possibilidades.append(
-                                [missionarios_novos, canibais_novos, 1])
-                    else:
-                        # Se não há missionários na viagem, adiciona a possibilidade
-                        possibilidades.append(
-                            [missionarios_novos, canibais_novos, 1])
+        # Se o barco está na margem direita
+        for i in range(1, 3):
+            for j in range(0, i + 1):
+                missionarios_novos = missionarios + j
+                canibais_novos = canibais + (i - j)
+
+                if is_estado_valido(missionarios_novos, canibais_novos):
+                    possibilidades.append(
+                        [missionarios_novos, canibais_novos, MARGEM_ESQUERDA])
 
     return possibilidades
 
 
+def is_estado_valido(missionarios, canibais):
+    """
+    Verifica se um estado é válido de acordo com as regras do problema.
+    """
+    if missionarios < 0 or canibais < 0 or missionarios > NUM_MISSIONARIOS or canibais > NUM_CANIBAIS:
+        return False
+
+    # Verifica se há mais canibais do que missionários em qualquer margem
+    if (missionarios > 0 and canibais > missionarios) or (missionarios < NUM_MISSIONARIOS and canibais < missionarios):
+        return False
+
+    return True
+
 # A busca em amplitude deve garantir que nenhum estado seja visitado mais de uma vez,
 # portanto usamos uma lista de estados explorados para garantir isso.
+
+
 def bfs(inicio, final):
     # O front é o nosso estado inicial
     # O explorado é uma lista de estados já visitados
@@ -100,9 +89,8 @@ def bfs(inicio, final):
     return path
 
 
-inicio = [3, 3, 1]
-final = [0, 0, 0]
-
+inicio = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
+final = [0, 0, MARGEM_DIREITA]
 resposta = bfs(inicio, final)
 contador = 0
 
