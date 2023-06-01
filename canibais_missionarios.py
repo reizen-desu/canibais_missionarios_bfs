@@ -16,6 +16,19 @@ NUM_MISSIONARIOS = 3
 NUM_CANIBAIS = 3
 
 
+def exibir_instrucoes():
+    """
+    Exibe as instruções para leitura dos estados com destaque adicional e negrito.
+    """
+    print("===================================================================")
+    print("Instruções para leitura dos estados:")
+    print("\033[1;34m\033[1mTexto em azul:\033[0m O barco está na margem esquerda")
+    print("\033[1;33m\033[1mTexto em amarelo:\033[0m O barco está na margem direita")
+    print(
+        "\033[1;30m\033[1mTexto em cinza:\033[0m Possibilidades com estados já explorados")
+    print("===================================================================")
+
+
 def movimentos(estado, explorados):
     """
     Retorna uma lista dos movimentos possíveis (viagens permitidas)
