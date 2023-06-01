@@ -72,7 +72,7 @@ def is_estado_valido(missionarios, canibais):
     # Verifica se há mais canibais do que missionários em qualquer margem
     if (missionarios > 0 and canibais > missionarios) or (missionarios < NUM_MISSIONARIOS and canibais < missionarios):
         return False
-
+        
     return True
 
 
@@ -82,10 +82,11 @@ def is_estado_valido(missionarios, canibais):
 
 def bfs(estado_inicial, estado_final):
     """
-    O front é a nossa fila de estados a serem explorados.
-    O front é inicializado com o estado inicial.
+    A fila é a nossa lista de estados a serem explorados.
+    A fila é inicializado com o estado inicial.
     O explorado é uma lista de estados já visitados.
     """
+
     fila = [[estado_inicial]]
     explorado = []
     # Enquanto houver estados a serem explorados na fila
@@ -98,7 +99,7 @@ def bfs(estado_inicial, estado_final):
 
         if fim in explorado:
             continue
-        for movimento, _ in movimentos(fim, explorado):
+        for movimento, _ in obter_movimentos_possiveis(fim, explorado):
             # Se o estado já foi explorado, não o adiciona à fila e continua a busca pelo próximo estado
             if movimento in explorado:
                 continue
@@ -111,27 +112,33 @@ def bfs(estado_inicial, estado_final):
     return caminho
 
 
-estado_inicial = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
-estado_final = [0, 0, MARGEM_DIREITA]
+def encontrar_caminho(estado_inicial, estado_final):
 
-resposta = bfs(estado_inicial, estado_final)
-# O total de movimentos é igual ao tamanho da resposta menos o estado inicial
-total_movimentos = len(resposta) - 1
-contador = 0
+    if not is_estado_valido(estado_inicial[0], estado_inicial[1]):
+        print("===================================================================")
+        print("O estado inicial fornecido não é válido.")
+        print("===================================================================")
+        return
 
-if resposta:
-    for estado in resposta:
+    caminho = bfs(estado_inicial, estado_final)
+
+    for estado in caminho:
         print('')
         print('------------')
-        print('\033[1;36mMovimento\033[0m', contador)
+        print('Movimento #', caminho.index(estado))
+        print('')
+        print(estado)
         print('Missionários:', estado[0])
         print('Canibais:', estado[1])
         print('Posição do barco:', estado[2])
         print('------------')
-        contador += 1
 
-    print('Total de Movimentos:', total_movimentos)
-else:
-    print('Não há solução para o problema.')
+    print('Total de Movimentos:', len(caminho) - 1)
 
-exibir_instrucoes()
+    exibir_instrucoes()
+
+
+estado_inicial = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
+estado_final = [0, 0, MARGEM_DIREITA]
+
+encontrar_caminho(estado_inicial, estado_final)
