@@ -16,10 +16,11 @@ NUM_MISSIONARIOS = 3
 NUM_CANIBAIS = 3
 
 
-def movimentos(estado):
+def movimentos(estado, explorados):
     """
     Retorna uma lista dos movimentos possíveis (viagens permitidas)
-    em um dado estado do problema
+    em um dado estado do problema.
+    Os estados já explorados serão impressos em vermelho.
     """
     possibilidades = []
     missionarios, canibais, posicao_barco = estado
@@ -33,8 +34,14 @@ def movimentos(estado):
                 canibais_novos = canibais - (i - j)
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
-                    possibilidades.append(
-                        [missionarios_novos, canibais_novos, POSICAO_DIREITA])
+                    novo_estado = [missionarios_novos,
+                                   canibais_novos, POSICAO_DIREITA]
+                    if novo_estado in explorados:
+                        possibilidades.append(
+                            (novo_estado, True))  # Estado explorado
+                    else:
+                        # Estado não explorado
+                        possibilidades.append((novo_estado, False))
     else:
         # Se o barco está na margem direita
         for i in range(1, 3):
@@ -43,12 +50,22 @@ def movimentos(estado):
                 canibais_novos = canibais + (i - j)
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
-                    possibilidades.append(
-                        [missionarios_novos, canibais_novos, POSICAO_ESQUERDA])
+                    novo_estado = [missionarios_novos,
+                                   canibais_novos, POSICAO_ESQUERDA]
+                    if novo_estado in explorados:
+                        possibilidades.append(
+                            (novo_estado, True))  # Estado explorado
+                    else:
+                        # Estado não explorado
+                        possibilidades.append((novo_estado, False))
 
     print(len(possibilidades), 'possibilidade(s):')
-    for p in possibilidades:
-        print(p)
+    for p, explorado in possibilidades:
+        if explorado:
+            # Imprime em vermelho os estados explorados
+            print('\033[1;31m', p, '\033[0m')
+        else:
+            print(p)
     print('-------------------')
     return possibilidades
 
@@ -73,9 +90,9 @@ def is_estado_valido(missionarios, canibais):
 
 def bfs(estado_inicial, estado_final):
     """
-    O front é a nossa fila de estados a serem explorados
-    O front é inicializado com o estado inicial
-    O explorado é uma lista de estados já visitados
+    O front é a nossa fila de estados a serem explorados.
+    O front é inicializado com o estado inicial.
+    O explorado é uma lista de estados já visitados.
     """
     fila = [[estado_inicial]]
     explorado = []
@@ -85,12 +102,11 @@ def bfs(estado_inicial, estado_final):
         fila = fila[1:]
         fim = caminho[-1]
 
-        # print("Iteração", len(explorado) + 1)
         print("Explorados até agora:", explorado)
 
         if fim in explorado:
             continue
-        for movimento in movimentos(fim):
+        for movimento, _ in movimentos(fim, explorado):
             # Se o estado já foi explorado, não o adiciona à fila e continua a busca pelo próximo estado
             if movimento in explorado:
                 continue
