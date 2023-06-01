@@ -78,7 +78,12 @@ def movimentos(estado, explorados):
             # Imprime em vermelho os estados explorados
             print('\033[1;31m', p, '\033[0m')
         else:
-            print(p)
+            if p[2] == MARGEM_ESQUERDA:
+                # Imprime em amarelo os estados na margem esquerda
+                print('\033[1;33m', p, '\033[0m')
+            else:
+                # Imprime em azul os estados na margem direita
+                print('\033[1;34m', p, '\033[0m')
     print('-------------------')
     return possibilidades
 
