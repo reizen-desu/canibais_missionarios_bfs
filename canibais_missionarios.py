@@ -1,9 +1,10 @@
 """
-As regras são de que o barco pode levar no máximo 2 pessoas e que sempre devem ter mais missionários do que canibais em uma dada margem do rio.
-Para o barco: 1 (está na margem) ou 0 (está do outro lado).
+Regras do problema:
+- O barco transporta no máximo 2 pessoas.
+- Deve haver mais missionários do que canibais em uma margem.
 [Missionarios, Canibais, Barco]
-Estado Inicial = [3,3,1] -> Todos os missionários e canibais + o barco
-Estado Final = [0,0,0] -> Todos passaram para a outra margem
+Estado Inicial: [3, 3, 1] (Todos missionários, canibais e o barco em uma margem)
+Estado Final: [0, 0, 0] (Todos na outra margem)
 """
 
 # Declaração das margens do rio e do número inicial de missionários e canibais
@@ -38,9 +39,8 @@ def obter_estados_vizinhos(estado_atual, explorados):
     print("Estado atual:", estado_atual)
     margem_destino = MARGEM_DIREITA if posicao_barco == MARGEM_ESQUERDA else MARGEM_ESQUERDA
 
-    # Estes for aninhados, ermitem explorar todas as combinações possíveis de movimentos de missionários e canibais
-    # a partir do estado_atual, gerando os estados vizinhos e verificando sua validade.
-    # O primeiro loop determina o número de canibais que serão levados em uma viagem (variando de 1 a 2)
+    # Explora todas as combinações possíveis de movimentos de missionários e canibais a partir do estado_atual.
+    # O primeiro loop determina o número de canibais que serão levados em uma viagem (1 a 2).
     for i in range(1, 3):
         # O segundo loop determina o número de missionários que serão levados em uma viagem
         # (variando de 0 a i (número de canibais escolhidos no primeiro loop))
@@ -53,8 +53,9 @@ def obter_estados_vizinhos(estado_atual, explorados):
                 canibais_novos = canibais + (i - j)
 
             if is_estado_valido(missionarios_novos, canibais_novos):
+                # Cria o estado vizinho se ele for válido
                 estado_vizinho = [missionarios_novos,
-                                  canibais_novos, margem_destino]  # Cria o estado vizinho se ele for válido
+                                  canibais_novos, margem_destino]
                 # Verifica se o estado já foi explorado anteriormente
                 estado_explorado = estado_vizinho in explorados
                 # Se não foi, adiciona à lista de estados vizinhos
