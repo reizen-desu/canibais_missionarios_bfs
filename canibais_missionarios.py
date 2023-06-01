@@ -26,7 +26,7 @@ def exibir_instrucoes():
     print("===================================================================")
 
 
-def movimentos(estado, explorados):
+def obter_movimentos_possiveis(estado, explorados):
     """
     Retorna uma lista dos movimentos possíveis (viagens permitidas)
     em um dado estado do problema.
@@ -35,52 +35,29 @@ def movimentos(estado, explorados):
     possibilidades = []
     missionarios, canibais, posicao_barco = estado
 
-    print("Estado: ", estado)
-    if posicao_barco == MARGEM_ESQUERDA:
-        # Se o barco está na margem esquerda
-        for i in range(1, 3):
-            for j in range(0, i + 1):
+    print("Estado:", estado)
+    margem_destino = MARGEM_DIREITA if posicao_barco == MARGEM_ESQUERDA else MARGEM_ESQUERDA
+
+    for i in range(1, 3):
+        for j in range(0, i + 1):
+            if posicao_barco == MARGEM_ESQUERDA:
                 missionarios_novos = missionarios - j
                 canibais_novos = canibais - (i - j)
-
-                if is_estado_valido(missionarios_novos, canibais_novos):
-                    novo_estado = [missionarios_novos,
-                                   canibais_novos, MARGEM_DIREITA]
-                    if novo_estado in explorados:
-                        possibilidades.append(
-                            (novo_estado, True))  # Estado explorado
-                    else:
-                        # Estado não explorado
-                        possibilidades.append((novo_estado, False))
-    else:
-        # Se o barco está na margem direita
-        for i in range(1, 3):
-            for j in range(0, i + 1):
+            else:
                 missionarios_novos = missionarios + j
                 canibais_novos = canibais + (i - j)
 
-                if is_estado_valido(missionarios_novos, canibais_novos):
-                    novo_estado = [missionarios_novos,
-                                   canibais_novos, MARGEM_ESQUERDA]
-                    if novo_estado in explorados:
-                        possibilidades.append(
-                            (novo_estado, True))  # Estado explorado
-                    else:
-                        # Estado não explorado
-                        possibilidades.append((novo_estado, False))
+            if is_estado_valido(missionarios_novos, canibais_novos):
+                novo_estado = [missionarios_novos,
+                               canibais_novos, margem_destino]
+                explorado = novo_estado in explorados
+                possibilidades.append((novo_estado, explorado))
 
     print(len(possibilidades), 'possibilidade(s):')
     for p, explorado in possibilidades:
-        if explorado:
-            # Imprime em vermelho os estados explorados
-            print('\033[1;30m', p, '\033[0m')
-        else:
-            if p[2] == MARGEM_ESQUERDA:
-                # Imprime em amarelo os estados na margem esquerda
-                print('\033[1;33m', p, '\033[0m')
-            else:
-                # Imprime em azul os estados na margem direita
-                print('\033[1;34m', p, '\033[0m')
+        cor = '\033[1;30m' if explorado else '\033[1;33m' if p[2] == MARGEM_ESQUERDA else '\033[1;34m'
+        print(cor, p, '\033[0m')
+
     print('-------------------')
     return possibilidades
 
