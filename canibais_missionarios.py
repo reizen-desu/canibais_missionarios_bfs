@@ -8,8 +8,8 @@ Estado Final = [0,0,0] -> Todos passaram
 
 
 # Constantes para representar as margens do rio
-MARGEM_ESQUERDA = 0
-MARGEM_DIREITA = 1
+POSICAO_ESQUERDA = 1
+POSICAO_DIREITA = 0
 
 # Constantes para o número inicial de missionários e canibais
 NUM_MISSIONARIOS = 3
@@ -22,9 +22,10 @@ def movimentos(estado):
     em um dado estado do problema
     """
     possibilidades = []
-    missionarios, canibais, margem_barco = estado
+    missionarios, canibais, posicao_barco = estado
 
     print("Estado: ", estado)
+    if posicao_barco == POSICAO_ESQUERDA:
         # Se o barco está na margem esquerda
         for i in range(1, 3):
             for j in range(0, i + 1):
@@ -33,7 +34,7 @@ def movimentos(estado):
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
                     possibilidades.append(
-                        [missionarios_novos, canibais_novos, MARGEM_DIREITA])
+                        [missionarios_novos, canibais_novos, POSICAO_DIREITA])
     else:
         # Se o barco está na margem direita
         for i in range(1, 3):
@@ -43,7 +44,7 @@ def movimentos(estado):
 
                 if is_estado_valido(missionarios_novos, canibais_novos):
                     possibilidades.append(
-                        [missionarios_novos, canibais_novos, MARGEM_ESQUERDA])
+                        [missionarios_novos, canibais_novos, POSICAO_ESQUERDA])
 
     print(len(possibilidades), 'possibilidade(s):')
     for p in possibilidades:
@@ -65,36 +66,48 @@ def is_estado_valido(missionarios, canibais):
 
     return True
 
+
 # A busca em amplitude deve garantir que nenhum estado seja visitado mais de uma vez,
 # portanto usamos uma lista de estados explorados para garantir isso.
 
 
-def bfs(inicio, final):
-    # O front é o nosso estado inicial
-    # O explorado é uma lista de estados já visitados
-    front = [[inicio]]
+def bfs(estado_inicial, estado_final):
+    """
+    O front é a nossa fila de estados a serem explorados
+    O front é inicializado com o estado inicial
+    O explorado é uma lista de estados já visitados
+    """
+    fila = [[estado_inicial]]
     explorado = []
-    # Enquanto houver estados a serem explorados
-    while front:
-        path = front[0]
-        front = front[1:]
-        fim = path[-1]
+    # Enquanto houver estados a serem explorados na fila
+    while fila:
+        caminho = fila[0]
+        fila = fila[1:]
+        fim = caminho[-1]
+
+        # print("Iteração", len(explorado) + 1)
+        print("Explorados até agora:", explorado)
+
         if fim in explorado:
             continue
         for movimento in movimentos(fim):
+            # Se o estado já foi explorado, não o adiciona à fila e continua a busca pelo próximo estado
             if movimento in explorado:
                 continue
-            front.append(path + [movimento])
+            fila.append(caminho + [movimento])
         explorado.append(fim)
-        # Se o estado final for encontrado, retorna o caminho
-        if fim == final:
+        # Se o estado final for encontrado, retorna o caminho e termina a busca
+        if fim == estado_final:
             break
 
-    return path
+    return caminho
 
 
-inicio = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
-final = [0, 0, MARGEM_DIREITA]
+estado_inicial = [NUM_MISSIONARIOS, NUM_CANIBAIS, POSICAO_ESQUERDA]
+estado_final = [0, 0, POSICAO_DIREITA]
+
+resposta = bfs(estado_inicial, estado_final)
+# O total de movimentos é igual ao tamanho da resposta menos o estado inicial
 total_movimentos = len(resposta) - 1
 contador = 0
 
