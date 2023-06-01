@@ -24,7 +24,7 @@ def movimentos(estado):
     possibilidades = []
     missionarios, canibais, margem_barco = estado
 
-    if margem_barco == MARGEM_ESQUERDA:
+    print("Estado: ", estado)
         # Se o barco está na margem esquerda
         for i in range(1, 3):
             for j in range(0, i + 1):
@@ -45,6 +45,10 @@ def movimentos(estado):
                     possibilidades.append(
                         [missionarios_novos, canibais_novos, MARGEM_ESQUERDA])
 
+    print(len(possibilidades), 'possibilidade(s):')
+    for p in possibilidades:
+        print(p)
+    print('-------------------')
     return possibilidades
 
 
@@ -91,15 +95,17 @@ def bfs(inicio, final):
 
 inicio = [NUM_MISSIONARIOS, NUM_CANIBAIS, MARGEM_ESQUERDA]
 final = [0, 0, MARGEM_DIREITA]
-resposta = bfs(inicio, final)
+total_movimentos = len(resposta) - 1
 contador = 0
 
 for estado in resposta:
     print('')
     print('------------')
-    print('Movimento', contador)
+    print('\033[1;36mMovimento\033[0m', contador)
     print('Missionários:', estado[0])
     print('Canibais:', estado[1])
-    print('Barco na margem:', estado[2])
+    print('Posição do barco:', estado[2])
     print('------------')
     contador += 1
+
+print('Total de Movimentos:', total_movimentos)
