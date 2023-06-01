@@ -26,19 +26,24 @@ def exibir_instrucoes():
     print("===================================================================")
 
 
-def obter_movimentos_possiveis(estado, explorados):
+def obter_estados_vizinhos(estado_atual, explorados):
     """
     Retorna uma lista dos movimentos possíveis (viagens permitidas)
     em um dado estado do problema.
     Os estados já explorados serão impressos em vermelho.
     """
-    possibilidades = []
-    missionarios, canibais, posicao_barco = estado
+    estados_vizinhos = []
+    missionarios, canibais, posicao_barco = estado_atual
 
-    print("Estado:", estado)
+    print("Estado atual:", estado_atual)
     margem_destino = MARGEM_DIREITA if posicao_barco == MARGEM_ESQUERDA else MARGEM_ESQUERDA
 
+    # Estes for aninhados, ermitem explorar todas as combinações possíveis de movimentos de missionários e canibais
+    # a partir do estado_atual, gerando os estados vizinhos e verificando sua validade.
+    # O primeiro loop determina o número de canibais que serão levados em uma viagem (variando de 1 a 2)
     for i in range(1, 3):
+        # O segundo loop determina o número de missionários que serão levados em uma viagem
+        # (variando de 0 a i (número de canibais escolhidos no primeiro loop))
         for j in range(0, i + 1):
             if posicao_barco == MARGEM_ESQUERDA:
                 missionarios_novos = missionarios - j
@@ -48,18 +53,20 @@ def obter_movimentos_possiveis(estado, explorados):
                 canibais_novos = canibais + (i - j)
 
             if is_estado_valido(missionarios_novos, canibais_novos):
-                novo_estado = [missionarios_novos,
-                               canibais_novos, margem_destino]
-                explorado = novo_estado in explorados
-                possibilidades.append((novo_estado, explorado))
+                estado_vizinho = [missionarios_novos,
+                                  canibais_novos, margem_destino]  # Cria o estado vizinho se ele for válido
+                # Verifica se o estado já foi explorado anteriormente
+                estado_explorado = estado_vizinho in explorados
+                # Se não foi, adiciona à lista de estados vizinhos
+                estados_vizinhos.append((estado_vizinho, estado_explorado))
 
-    print(len(possibilidades), 'possibilidade(s):')
-    for p, explorado in possibilidades:
-        cor = '\033[1;30m' if explorado else '\033[1;33m' if p[2] == MARGEM_ESQUERDA else '\033[1;34m'
+    print(len(estados_vizinhos), 'possibilidade(s):')
+    for p, estado_explorado in estados_vizinhos:
+        cor = '\033[1;30m' if estado_explorado else '\033[1;33m' if p[2] == MARGEM_ESQUERDA else '\033[1;34m'
         print(cor, p, '\033[0m')
 
     print('-------------------')
-    return possibilidades
+    return estados_vizinhos
 
 
 def is_estado_valido(missionarios, canibais):
@@ -72,7 +79,7 @@ def is_estado_valido(missionarios, canibais):
     # Verifica se há mais canibais do que missionários em qualquer margem
     if (missionarios > 0 and canibais > missionarios) or (missionarios < NUM_MISSIONARIOS and canibais < missionarios):
         return False
-        
+
     return True
 
 
@@ -85,31 +92,33 @@ def bfs(estado_inicial, estado_final):
     A fila é a nossa lista de estados a serem explorados.
     A fila é inicializado com o estado inicial.
     O explorado é uma lista de estados já visitados.
+    Temos a primeira fila (estados_a_explorar) em que é inicializado com o estado inicial
+    e uma lista de estados explorados vazia
     """
+    estados_a_explorar = [[estado_inicial]]
+    estados_explorados = []
 
-    fila = [[estado_inicial]]
-    explorado = []
     # Enquanto houver estados a serem explorados na fila
-    while fila:
-        caminho = fila[0]
-        fila = fila[1:]
-        fim = caminho[-1]
+    while estados_a_explorar:
+        caminho_atual = estados_a_explorar[0]
+        estados_a_explorar = estados_a_explorar[1:]
+        estado_atual = caminho_atual[-1]
 
-        print("Explorados até agora:", explorado)
+        print("Estados explorados até agora:", estados_explorados)
 
-        if fim in explorado:
+        if estado_atual in estados_explorados:
             continue
-        for movimento, _ in obter_movimentos_possiveis(fim, explorado):
+        for movimento, _ in obter_estados_vizinhos(estado_atual, estados_explorados):
             # Se o estado já foi explorado, não o adiciona à fila e continua a busca pelo próximo estado
-            if movimento in explorado:
+            if movimento in estados_explorados:
                 continue
-            fila.append(caminho + [movimento])
-        explorado.append(fim)
+            estados_a_explorar.append(caminho_atual + [movimento])
+        estados_explorados.append(estado_atual)
         # Se o estado final for encontrado, retorna o caminho e termina a busca
-        if fim == estado_final:
+        if estado_atual == estado_final:
             break
 
-    return caminho
+    return caminho_atual
 
 
 def encontrar_caminho(estado_inicial, estado_final):
@@ -134,6 +143,7 @@ def encontrar_caminho(estado_inicial, estado_final):
         print('------------')
 
     print('Total de Movimentos:', len(caminho) - 1)
+    print('Trajecto percorrido:', caminho)
 
     exibir_instrucoes()
 
