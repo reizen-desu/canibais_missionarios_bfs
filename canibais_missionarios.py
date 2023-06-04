@@ -90,35 +90,36 @@ def is_estado_valido(missionarios, canibais):
 
 def bfs(estado_inicial, estado_final):
     """
-    A fila é a nossa lista de estados a serem explorados.
-    A fila é inicializado com o estado inicial.
-    O explorado é uma lista de estados já visitados.
-    Temos a primeira fila (estados_a_explorar) em que é inicializado com o estado inicial
-    e uma lista de estados explorados vazia
+    Busca em amplitude (BFS) para encontrar o caminho entre o estado inicial e o estado final.
+    O lista (estados_a_explorar) é uma fila que recebe o primeiro caminho (estado inicial) e
+    a lista (estados_explorados) é uma lista de estados visitados que é inicialmente vazia.
     """
     estados_a_explorar = [[estado_inicial]]
-    estados_explorados = []
+    estados_explorados = [] 
 
     # Enquanto houver estados a serem explorados na fila
     while estados_a_explorar:
-        caminho_atual = estados_a_explorar[0]
-        estados_a_explorar = estados_a_explorar[1:]
+        # Remove o primeiro caminho da lista
+        caminho_atual = estados_a_explorar.pop(0)
+        # Obtém o último estado do caminho atual
         estado_atual = caminho_atual[-1]
 
-        print("Estados explorados até agora:", estados_explorados)
-
         if estado_atual in estados_explorados:
-            continue
-        for movimento, _ in obter_estados_vizinhos(estado_atual, estados_explorados):
-            # Se o estado já foi explorado, não o adiciona à fila e continua a busca pelo próximo estado
-            if movimento in estados_explorados:
-                continue
-            estados_a_explorar.append(caminho_atual + [movimento])
-        estados_explorados.append(estado_atual)
-        # Se o estado final for encontrado, retorna o caminho e termina a busca
-        if estado_atual == estado_final:
-            break
+            continue  # Se o estado atual já foi explorado, pula para a próxima iteração
 
+        # Adiciona o estado atual à lista de estados explorados
+        estados_explorados.append(estado_atual)
+
+        if estado_atual == estado_final:
+            break  # Se o estado atual é o estado final, encerra o loop e retorna o caminho
+
+        # Obtém os estados vizinhos do estado atual
+        for estado_vizinho, _ in obter_estados_vizinhos(estado_atual, estados_explorados):
+            if estado_vizinho not in estados_explorados:
+                # Adiciona o caminho atualizado à lista de estados a explorar
+                estados_a_explorar.append(caminho_atual + [estado_vizinho])
+
+        print("Estados explorados até o momento:", estados_explorados)
     return caminho_atual
 
 
