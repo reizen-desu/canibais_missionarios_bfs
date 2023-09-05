@@ -11,7 +11,7 @@ Estado Final: [0, 0, 0] (Todos na outra margem)
 MARGEM_ESQUERDA = 1
 MARGEM_DIREITA = 0
 NUM_MISSIONARIOS = 3
-NUM_CANIBAIS = 3
+NUM_CANIBAIS = 1
 
 
 def exibir_instrucoes():
@@ -107,6 +107,8 @@ def bfs(estado_inicial, estado_final):
         if estado_atual in estados_explorados:
             continue  # Se o estado atual já foi explorado, pula para a próxima iteração
 
+        print("Estados explorados até o momento:", estados_explorados)
+        
         # Adiciona o estado atual à lista de estados explorados
         estados_explorados.append(estado_atual)
 
@@ -119,7 +121,6 @@ def bfs(estado_inicial, estado_final):
                 # Adiciona o caminho atualizado à lista de estados a explorar
                 estados_a_explorar.append(caminho_atual + [estado_vizinho])
 
-        print("Estados explorados até o momento:", estados_explorados)
     return caminho_atual
 
 
